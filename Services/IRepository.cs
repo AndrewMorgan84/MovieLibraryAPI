@@ -6,5 +6,6 @@ namespace MovieLibraryAPI.Services
     public interface IRepository
     {
         List<Genre> GetAllGenres();
+        Genre GetGenreById(int Id);
     }
 }
