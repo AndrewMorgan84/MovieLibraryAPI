@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MovieLibraryAPI.Services;
 
 namespace MovieLibraryAPI
 {
@@ -21,6 +22,7 @@ namespace MovieLibraryAPI
         {
 
             services.AddControllers();
+            services.AddSingleton<IRepository, InMemoryRepository>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieLibraryAPI", Version = "v1" });
