@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using MovieLibraryAPI.Entities;
-using MovieLibraryAPI.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,47 +11,43 @@ namespace MovieLibraryAPI.Controllers
     [ApiController]
     public class GenresController : ControllerBase
     {
-        private readonly IRepository repository;
+        private readonly ILogger<GenresController> _logger;
 
-        public GenresController(IRepository repository)
+        public GenresController(ILogger<GenresController> logger)
         {
-            this.repository = repository;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Genre>>>  Get()
         {
-            return await repository.GetAllGenres();
+            _logger.LogInformation("Getting All Genres");
+            return new List<Genre>() { new Genre() { Id = 1, Name = "Comedy" } };
         }
 
         [HttpGet("{Id:int}")]
         public ActionResult<Genre> Get(int Id)
         {
-            var genre = repository.GetGenreById(Id);
 
-            if(genre == null)
-            {
-                return NotFound();
-            }
-            return genre;
+            throw new NotImplementedException();
         }
 
         [HttpPost]
         public ActionResult Post([FromBody] Genre genre)
         {
-            return NoContent();
+            throw new NotImplementedException();
         }
 
         [HttpPut]
         public ActionResult Put([FromBody] Genre genre)
         {
-            return NoContent();
+            throw new NotImplementedException();
         }
 
         [HttpDelete]
         public ActionResult Delete()
         {
-            return NoContent();
+            throw new NotImplementedException();
         }
     }
 }

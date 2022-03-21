@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using MovieLibraryAPI.Services;
+using MovieLibraryAPI.Filters;
 
 namespace MovieLibraryAPI
 {
@@ -21,8 +22,11 @@ namespace MovieLibraryAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
-            services.AddSingleton<IRepository, InMemoryRepository>();
+            services.AddControllers(options => {
+                options.Filters.Add(typeof(MyExceptionFilter));
+            });
+            services.AddResponseCaching();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieLibraryAPI", Version = "v1" });
@@ -42,6 +46,8 @@ namespace MovieLibraryAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

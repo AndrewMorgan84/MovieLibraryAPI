@@ -10,7 +10,7 @@ namespace MovieLibraryAPI.Validations
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value == null || string.IsNullOrEmpty(value.ToString()){
+            if (value == null || string.IsNullOrEmpty(value.ToString())){
                 return ValidationResult.Success;
             }
 
