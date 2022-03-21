@@ -25,7 +25,7 @@ namespace MovieLibraryAPI.Services
 
         public async Task<List<Genre>> GetAllGenres()
         {
-            await Task.Delay(3000);
+            await Task.Delay(1);
             return _genres;
         }
 
