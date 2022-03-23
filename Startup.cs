@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MovieLibraryAPI.Filters;
+using MovieLibraryAPI.Helpers;
 
 namespace MovieLibraryAPI
 {
@@ -36,6 +37,9 @@ namespace MovieLibraryAPI
                 });
             });
             services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IFileStorageService, InAppStorageService>();
+            services.AddHttpContextAccessor();
+
             services.AddControllers(options => {
                 options.Filters.Add(typeof(MyExceptionFilter));
             });
@@ -58,6 +62,8 @@ namespace MovieLibraryAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 
