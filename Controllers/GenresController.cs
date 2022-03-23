@@ -66,10 +66,17 @@ namespace MovieLibraryAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
-        public ActionResult Delete()
+        [HttpDelete("{Id:int}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            throw new NotImplementedException();
+            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == id);
+            if(genre == null)
+            {
+                return NotFound();
+            }
+            _context.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
