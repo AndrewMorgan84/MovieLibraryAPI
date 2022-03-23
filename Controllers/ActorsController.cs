@@ -49,7 +49,7 @@ namespace MovieLibraryAPI.Controllers
         public async Task<ActionResult> Post([FromForm] ActorCreationDTO actorCreationDTO)
         {
             var actor = _mapper.Map<Actor>(actorCreationDTO);
-            if(actor.Picture != null)
+            if(actorCreationDTO.Picture != null)
             {
                 actor.Picture = await _fileStorageService.SaveFile(_containerName, actorCreationDTO.Picture);
             }
