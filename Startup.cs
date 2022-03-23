@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,7 @@ namespace MovieLibraryAPI
                     builder.WithOrigins(frontendUrl).AllowAnyMethod().AllowAnyHeader();
                 });
             });
+            services.AddAutoMapper(typeof(Startup));
             services.AddControllers(options => {
                 options.Filters.Add(typeof(MyExceptionFilter));
             });
