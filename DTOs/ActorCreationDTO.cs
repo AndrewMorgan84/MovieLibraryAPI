@@ -13,6 +13,6 @@ namespace MovieLibraryAPI.DTOs
 
         public string Biography { get; set; }
 
-        public string Picture { get; set; }
+        //public string Picture { get; set; }
     }
 }
