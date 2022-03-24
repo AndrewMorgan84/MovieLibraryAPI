@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MovieLibraryAPI.DTOs;
 using MovieLibraryAPI.Entities;
 using MovieLibraryAPI.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MovieLibraryAPI.Controllers
