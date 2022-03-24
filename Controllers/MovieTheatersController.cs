@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieLibraryAPI.DTOs;
 using MovieLibraryAPI.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ namespace MovieLibraryAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<MovieTheaterDTO>>> Get()
         {
-            var entities = await _context.MovieTheaters.ToListAsync();
+            var entities = await _context.MovieTheaters.OrderBy(mt => mt.Name).ToListAsync();
             return _mapper.Map<List<MovieTheaterDTO>>(entities);
         }
 
