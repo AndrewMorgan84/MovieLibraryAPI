@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MovieLibraryAPI.Filters;
 using MovieLibraryAPI.Helpers;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 
 namespace MovieLibraryAPI
 {
@@ -26,8 +28,10 @@ namespace MovieLibraryAPI
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), 
+                    sqlOptions => sqlOptions.UseNetTopologySuite());
             });
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -38,6 +42,13 @@ namespace MovieLibraryAPI
                 });
             });
             services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton(provider => new MapperConfiguration(config =>
+            {
+                var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+                config.AddProfile(new AutoMapperProfiles(geometryFactory));
+            }).CreateMapper());
+            services.AddSingleton(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+
             services.AddScoped<IFileStorageService, InAppStorageService>();
             services.AddHttpContextAccessor();
 
