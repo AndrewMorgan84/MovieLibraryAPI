@@ -64,16 +64,19 @@ namespace MovieLibraryAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromForm] ActorCreationDTO actorCreationDTO)
         {
-            var actor = await _context.Actors.FirstOrDefaultAsync(a => a.Id == id);
-            if(actor == null)
+            var actor = await _context.Actors.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (actor == null)
             {
                 return NotFound();
             }
+
             actor = _mapper.Map(actorCreationDTO, actor);
 
-            if(actorCreationDTO != null)
+            if (actorCreationDTO.Picture != null)
             {
-                actor.Picture = await _fileStorageService.EditFile(_containerName, actorCreationDTO.Picture, actor.Picture);
+                actor.Picture = await _fileStorageService.EditFile(_containerName,
+                    actorCreationDTO.Picture, actor.Picture);
             }
 
             await _context.SaveChangesAsync();

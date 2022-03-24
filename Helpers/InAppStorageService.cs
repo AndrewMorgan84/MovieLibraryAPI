@@ -61,8 +61,8 @@ namespace MovieLibraryAPI.Helpers
             }
 
             var url = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
-            var routeForDb = Path.Combine(url, containerName, fileName).Replace("\\", "/");
-            return routeForDb;
-        } 
+            var routeForDB = Path.Combine(url, containerName, fileName).Replace("\\", "/");
+            return routeForDB;
+        }
     }
 }
