@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MovieLibraryAPI.DTOs;
 using MovieLibraryAPI.Entities;
 using MovieLibraryAPI.Helpers;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MovieLibraryAPI.Controllers
@@ -21,6 +24,18 @@ namespace MovieLibraryAPI.Controllers
             _context = context;
             _mapper = mapper;
             _fileStorageService = fileStorageService;
+        }
+
+        [HttpGet("PostGet")]
+        public async Task<ActionResult<MoviePostGetDTO>> PostGet()
+        {
+            var movieTheaters = await _context.MovieTheaters.OrderBy(mt => mt.Name).ToListAsync();
+            var genres = await _context.Genres.OrderBy(g => g.Name).ToListAsync();
+
+            var movieTheatersDTO = _mapper.Map<List<MovieTheaterDTO>>(movieTheaters);
+            var genresDTO = _mapper.Map<List<GenreDTO>>(genres);
+
+            return new MoviePostGetDTO() { Genres = genresDTO, MovieTheaters = movieTheatersDTO };
         }
 
         [HttpPost]
