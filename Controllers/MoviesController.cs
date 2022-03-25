@@ -70,6 +70,8 @@ namespace MovieLibraryAPI.Controllers
             return dto;
         }
 
+
+
         [HttpGet("PostGet")]
         public async Task<ActionResult<MoviePostGetDTO>> PostGet()
         {
@@ -83,7 +85,7 @@ namespace MovieLibraryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromForm] MovieCreationDTO movieCreationDTO)
+        public async Task<ActionResult<int>> Post([FromForm] MovieCreationDTO movieCreationDTO)
         {
             var movie = _mapper.Map<Movie>(movieCreationDTO);
             if(movieCreationDTO.Poster != null) 
@@ -94,10 +96,10 @@ namespace MovieLibraryAPI.Controllers
             AnnotateActorsOrder(movie);
             _context.Add(movie);
             await _context.SaveChangesAsync();
-            return NoContent();
+            return movie.Id;
         }
 
-        [HttpGet("putget /{id: int}")]
+        [HttpGet("putget/{id:int}")]
         public async Task<ActionResult<MoviePutGetDTO>> PutGet(int id)
         {
             var movieActionResult = await Get(id);
