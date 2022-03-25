@@ -97,6 +97,41 @@ namespace MovieLibraryAPI.Controllers
             return NoContent();
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<MoviePutGetDTO>> PutGet(int id)
+        {
+            var movieActionResult = await Get(id);
+            if(movieActionResult.Result is NotFoundResult) { return NotFound(); }
+
+            var movie = movieActionResult.Value;
+            var selectedGenreIds = movie.Genres.Select(g => g.Id).ToList();
+            var nonSelectedGenreIds = await _context.Genres
+                .Where(g => !selectedGenreIds
+                .Contains(g.Id))
+                .ToListAsync();
+
+            var selectedMovieTheaters = movie.MovieTheaters.Select(mt => mt.Id).ToList();
+            var nonSelectedMovieTheaters = await _context.MovieTheaters
+                .Where(mt => !selectedMovieTheaters
+                .Contains(mt.Id))
+                .ToListAsync();
+
+            var nonSelectedGenresDTOs = _mapper.Map<List<GenreDTO>>(nonSelectedGenreIds);
+            var nonSelectedMovieTheatersDTO = _mapper.Map<List<MovieTheaterDTO>>(nonSelectedMovieTheaters);
+
+            var response = new MoviePutGetDTO()
+            {
+                Movie = movie,
+                SelectedGenres = movie.Genres,
+                NonSelectedGenres = nonSelectedGenresDTOs,
+                SelectedMovieTheaters = movie.MovieTheaters,
+                NonSelectedMovieTeaters = nonSelectedMovieTheatersDTO,
+                Actors = movie.Actors
+            };
+
+            return response;
+        }
+
         private void AnnotateActorsOrder(Movie movie)
         {
             if (movie.MoviesActors != null)
