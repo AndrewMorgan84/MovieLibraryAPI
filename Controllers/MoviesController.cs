@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MovieLibraryAPI.DTOs;
 using MovieLibraryAPI.Entities;
 using MovieLibraryAPI.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,30 @@ namespace MovieLibraryAPI.Controllers
             _context = context;
             _mapper = mapper;
             _fileStorageService = fileStorageService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<HomeDTO>> Get()
+        {
+            var top = 6;
+            var today = DateTime.Today;
+
+            var upcomingReleases = await _context.Movies
+                .Where(x => x.ReleaseDate > today)
+                .OrderBy(x => x.ReleaseDate)
+                .Take(top)
+                .ToListAsync();
+
+            var inTheaters = await _context.Movies
+                .Where(x => x.InTheaters)
+                .OrderBy(x => x.ReleaseDate)
+                .Take(top)
+                .ToListAsync();
+
+            var homeDTO = new HomeDTO();
+            homeDTO.UpcomingReleases = _mapper.Map<List<MovieDTO>>(upcomingReleases);
+            homeDTO.InTheaters = _mapper.Map<List<MovieDTO>>(inTheaters);
+            return homeDTO;
         }
 
         [HttpGet("{id:int}")]
