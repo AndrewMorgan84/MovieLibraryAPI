@@ -26,6 +26,25 @@ namespace MovieLibraryAPI.Controllers
             _fileStorageService = fileStorageService;
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<MovieDTO>> Get(int id)
+        {
+            var movie = await _context.Movies
+                .Include(m => m.MoviesGenres).ThenInclude(m => m.Genre)
+                .Include(m => m.MovieTheatersMovies).ThenInclude(m => m.MovieTheater)
+                .Include(m => m.MoviesActors).ThenInclude(m => m.Actor)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if(movie == null)
+            {
+                return NotFound();
+            }
+
+            var dto = _mapper.Map<MovieDTO>(movie);
+            dto.Actors = dto.Actors.OrderBy(a => a.Order).ToList();
+            return dto;
+        }
+
         [HttpGet("PostGet")]
         public async Task<ActionResult<MoviePostGetDTO>> PostGet()
         {
