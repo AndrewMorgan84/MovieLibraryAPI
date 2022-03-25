@@ -97,7 +97,7 @@ namespace MovieLibraryAPI.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("putget /{id: int}")]
         public async Task<ActionResult<MoviePutGetDTO>> PutGet(int id)
         {
             var movieActionResult = await Get(id);
@@ -130,6 +130,49 @@ namespace MovieLibraryAPI.Controllers
             };
 
             return response;
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] MovieCreationDTO movieCreationDTO)
+        {
+            var movie = await _context.Movies
+                .Include(m => m.MoviesActors)
+                .Include(m => m.MoviesGenres)
+                .Include(m => m.MovieTheatersMovies)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            movie = _mapper.Map(movieCreationDTO, movie);
+
+            if (movieCreationDTO.Poster != null)
+            {
+                movie.Poster = await _fileStorageService.EditFile(_container, movieCreationDTO.Poster,
+                    movie.Poster);
+            }
+
+            AnnotateActorsOrder(movie);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            _context.Remove(movie);
+            await _context.SaveChangesAsync();
+            await _fileStorageService.DeleteFile(movie.Poster, _container);
+            return NoContent();
         }
 
         private void AnnotateActorsOrder(Movie movie)
