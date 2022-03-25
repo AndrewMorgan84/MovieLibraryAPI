@@ -37,7 +37,7 @@ namespace MovieLibraryAPI.Controllers
         }
 
         [HttpPost("searchByName")]
-        public async Task<ActionResult<List<ActorsMovieDTO>>> SearchByName(string name)
+        public async Task<ActionResult<List<ActorsMovieDTO>>> SearchByName([FromBody] string name)
         {
             if (string.IsNullOrWhiteSpace(name)) { return new List<ActorsMovieDTO>(); }
             return await _context.Actors
