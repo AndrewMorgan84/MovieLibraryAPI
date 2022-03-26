@@ -8,7 +8,7 @@ namespace MovieLibraryAPI.DTOs
 
         public int RecordsPerPage { get; set; }
 
-        public PaginationDTO paginationDTO
+        public PaginationDTO PaginationDTO
         {
             get { return new PaginationDTO { Page = Page, RecordsPerPage = RecordsPerPage }; }
         }

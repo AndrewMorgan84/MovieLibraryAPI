@@ -45,9 +45,11 @@ namespace MovieLibraryAPI.Controllers
                 .Take(top)
                 .ToListAsync();
 
-            var homeDTO = new HomeDTO();
-            homeDTO.UpcomingReleases = _mapper.Map<List<MovieDTO>>(upcomingReleases);
-            homeDTO.InTheaters = _mapper.Map<List<MovieDTO>>(inTheaters);
+            var homeDTO = new HomeDTO
+            {
+                UpcomingReleases = _mapper.Map<List<MovieDTO>>(upcomingReleases),
+                InTheaters = _mapper.Map<List<MovieDTO>>(inTheaters)
+            };
             return homeDTO;
         }
 
@@ -70,7 +72,39 @@ namespace MovieLibraryAPI.Controllers
             return dto;
         }
 
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<MovieDTO>>> Filter([FromQuery] FilterMoviesDTO filterMoviesDTO)
+        {
+            var moviesQueryable = _context.Movies.AsQueryable();
 
+            if (!string.IsNullOrEmpty(filterMoviesDTO.Title))
+            {
+                moviesQueryable = moviesQueryable.Where(x => x.Title.Contains(filterMoviesDTO.Title));
+            }
+
+            if (filterMoviesDTO.InTheaters)
+            {
+                moviesQueryable = moviesQueryable.Where(x => x.InTheaters);
+            }
+
+            if (filterMoviesDTO.UpcomingReleases)
+            {
+                var today = DateTime.Today;
+                moviesQueryable = moviesQueryable.Where(x => x.ReleaseDate > today);
+            }
+
+            if (filterMoviesDTO.GenreId != 0)
+            {
+                moviesQueryable = moviesQueryable
+                    .Where(x => x.MoviesGenres.Select(y => y.GenreId)
+                    .Contains(filterMoviesDTO.GenreId));
+            }
+
+            await HttpContext.InsertParametersPaginationInHeader(moviesQueryable);
+            var movies = await moviesQueryable.OrderBy(x => x.Title).Paginate(filterMoviesDTO.PaginationDTO)
+                .ToListAsync();
+            return _mapper.Map<List<MovieDTO>>(movies);
+        }
 
         [HttpGet("PostGet")]
         public async Task<ActionResult<MoviePostGetDTO>> PostGet()
@@ -103,34 +137,30 @@ namespace MovieLibraryAPI.Controllers
         public async Task<ActionResult<MoviePutGetDTO>> PutGet(int id)
         {
             var movieActionResult = await Get(id);
-            if(movieActionResult.Result is NotFoundResult) { return NotFound(); }
+            if (movieActionResult.Result is NotFoundResult) { return NotFound(); }
 
             var movie = movieActionResult.Value;
-            var selectedGenreIds = movie.Genres.Select(g => g.Id).ToList();
-            var nonSelectedGenreIds = await _context.Genres
-                .Where(g => !selectedGenreIds
-                .Contains(g.Id))
+
+            var genresSelectedIds = movie.Genres.Select(x => x.Id).ToList();
+            var nonSelectedGenres = await _context.Genres.Where(x => !genresSelectedIds.Contains(x.Id))
                 .ToListAsync();
 
-            var selectedMovieTheaters = movie.MovieTheaters.Select(mt => mt.Id).ToList();
-            var nonSelectedMovieTheaters = await _context.MovieTheaters
-                .Where(mt => !selectedMovieTheaters
-                .Contains(mt.Id))
-                .ToListAsync();
+            var movieTheatersIds = movie.MovieTheaters.Select(x => x.Id).ToList();
+            var nonSelectedMovieTheaters = await _context.MovieTheaters.Where(x =>
+            !movieTheatersIds.Contains(x.Id)).ToListAsync();
 
-            var nonSelectedGenresDTOs = _mapper.Map<List<GenreDTO>>(nonSelectedGenreIds);
+            var nonSelectedGenresDTOs = _mapper.Map<List<GenreDTO>>(nonSelectedGenres);
             var nonSelectedMovieTheatersDTO = _mapper.Map<List<MovieTheaterDTO>>(nonSelectedMovieTheaters);
 
-            var response = new MoviePutGetDTO()
+            var response = new MoviePutGetDTO
             {
                 Movie = movie,
                 SelectedGenres = movie.Genres,
                 NonSelectedGenres = nonSelectedGenresDTOs,
                 SelectedMovieTheaters = movie.MovieTheaters,
-                NonSelectedMovieTeaters = nonSelectedMovieTheatersDTO,
+                NonSelectedMovieTheaters = nonSelectedMovieTheatersDTO,
                 Actors = movie.Actors
             };
-
             return response;
         }
 
