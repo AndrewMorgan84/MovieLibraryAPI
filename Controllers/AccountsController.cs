@@ -19,15 +19,13 @@ namespace MovieLibraryAPI.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
-        private readonly ApplicationDbContext _context;
 
         public AccountsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, 
-            IConfiguration configuration,ApplicationDbContext context)
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
-            _context = context;
         }
 
         [HttpPost("create")]
