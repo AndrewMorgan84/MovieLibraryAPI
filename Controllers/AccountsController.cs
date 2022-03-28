@@ -42,7 +42,7 @@ namespace MovieLibraryAPI.Controllers
 
             if (result.Succeeded)
             {
-                return BuildToken(userCredentials);
+                return await BuildToken(userCredentials);
             } else
             {
                 return BadRequest(result.Errors);
@@ -58,7 +58,7 @@ namespace MovieLibraryAPI.Controllers
 
             if (result.Succeeded)
             {
-                return BuildToken(userCredentials);
+                return await BuildToken(userCredentials);
             } else
             {
                 return BadRequest("Incorrect Login");
@@ -66,12 +66,17 @@ namespace MovieLibraryAPI.Controllers
         }
 
 
-        private AuthenticationResponse BuildToken(UserCredentials userCredentials)
+        private async Task<AuthenticationResponse> BuildToken(UserCredentials userCredentials)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email",userCredentials.Email)
             };
+
+            var user = await _userManager.FindByEmailAsync(userCredentials.Email);
+            var claimsDB = await _userManager.GetClaimsAsync(user);
+
+            claims.AddRange(claimsDB);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["keyjwt"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
